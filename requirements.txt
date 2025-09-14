@@ -18,3 +18,4 @@ beautifulsoup4
 requests
 psycopg2-binary
 langchain-huggingface
+pysqlite3-binary 
