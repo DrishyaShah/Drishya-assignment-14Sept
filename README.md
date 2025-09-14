@@ -1,19 +1,151 @@
-# Local Setup Instructions
+# Customer Support Copilot — Atlan Assignment
 
-## Prerequisites
+## Overview
+This project implements a **Customer Support Copilot** to streamline support operations using:
+- Automated ticket **classification (Topic, Sentiment, Priority)**
+- **Retrieval-Augmented Generation (RAG)** grounded in Atlan Docs & Developer Hub
+- **Smart escalation** when documentation is insufficient
+- **Dashboards** for monitoring classification, routing, and triage performance
+
+The solution was built with **Streamlit** for the UI, **Google Gemini 2.5 Flash** for language processing, and **Chroma Vector DB** for semantic retrieval. Ticket persistence is managed using **Supabase (Postgres)**.
+
+---
+
+## Problem Statement & Objective
+Support teams face:
+- Mounting response delays as organizations scale  
+- High volume of repetitive questions  
+- Inefficient routing impacting customer satisfaction  
+
+**Objectives of the Copilot:**
+- Classify support tickets automatically by topic, sentiment, and priority  
+- Generate knowledge-grounded answers from Atlan Docs & Developer Hub  
+- Auto-raise tickets when answers are incomplete/unavailable  
+- Provide dashboards for continuous monitoring and improvement  
+
+---
+
+##  High-Level Architecture
+
+![System Architecture](assets/atlan-customer-support-architecture.png)
+![Workflow Diagram](assets/atlan-customer-support-workflow.png)
+
+### 1. Ingestion & Knowledge Base
+- Crawl docs via sitemap → clean HTML → normalize formatting  
+- Chunk text with **RecursiveCharacterTextSplitter** (~800 tokens, 150 overlap)  
+- Embed chunks (`all-MiniLM-L6-v2`) → stored in **Chroma Vector DB**  
+- Metadata includes source URL + chunk ID for traceability  
+
+### 2. Orchestration Layer (LangGraph)
+- **Input Node**: Accepts queries or sample tickets  
+- **RAG Node**: Retrieves + grounds answers in documentation  
+- **Classifier Nodes**: Topic, Sentiment, Priority (parallel execution)  
+- **Ticket Creation Node**: Stores enriched tickets in Postgres  
+
+### 3. Retrieval-Augmented Generation (RAG)
+- Retriever: Chroma returns top-3 chunks  
+- Gemini 2.5 Flash → outputs:
+  - JSON (topic, sentiment, priority, citations)  
+  - Natural language answer with sources  
+- Few-shot + structured output prompts for consistency  
+
+### 4. Dashboard & UI (Streamlit)
+- **Interactive Chat UI**: Agent view with classification inline + sources cited  
+- **Bulk Dashboard**: Classifies sample tickets on load  
+- **Analytics**: Pie charts, heatmaps, KPIs for volume, priority, sentiment  
+
+---
+
+## Technology Stack & Design Decisions
+- **Framework:** LangGraph (workflow orchestration, state management)  
+- **LLM:** Google Gemini 2.5 Flash (fast, cost-effective, structured outputs)  
+- **Vector DB:** Chroma + HuggingFace embeddings (lightweight, no vendor lock-in)  
+- **Frontend:** Streamlit (rapid prototyping, deployment-ready)  
+- **Database:** Supabase (Postgres) for reliable ticket persistence  
+
+---
+
+## Project Structure
+```
+Drishya_assignment_Sept2025/
+├── apps/
+│   ├── streamlit_agent.py       # Interactive AI agent
+│   └── streamlit_dashboard.py   # Ticket analytics dashboard
+├── src/
+│   ├── workflow.py              # LangGraph orchestration
+│   ├── llm.py                   # Gemini client + structured outputs
+│   ├── retriever.py             # RAG pipeline
+│   ├── ticketing.py             # Ticket creation logic
+│   ├── db.py                    # Database models
+│   ├── scraping.py              # Sitemap scraping
+│   ├── schemas.py               # Pydantic models
+│   └── config.py                # Config management
+├── main.py                      # App entry point
+├── requirements.txt             # Python dependencies
+├── .env.example                 # Example environment config
+└── README.md
+```
+
+---
+
+## Classification Schema
+- **Topic Tags:** How-to, Product, Connector, Lineage, API/SDK, SSO, Glossary, Best practices, Sensitive data  
+- **Sentiment:** Frustrated, Curious, Angry, Neutral  
+- **Priority:** P0 (High), P1 (Medium), P2 (Low)  
+
+---
+
+## RAG Strategy & Guardrails
+- Retrieval: top-3 chunks, cosine similarity scoring  
+- Sources restricted to `docs.atlan.com` & `developer.atlan.com`  
+- Answering: model must cite URLs + chunk IDs  
+- Guardrails:
+  - “Answer only from provided context”  
+  - If insufficient → refuse & route ticket  
+  - Confidence score + CTA: *“Not satisfied? Raise ticket”*  
+
+---
+
+##  Ticketing, Routing & Dashboard
+- Auto-raise ticket when no context retrieved or user dissatisfied  
+- Store metadata in Postgres (topic, sentiment, priority, squad)  
+- **KPIs visualized:**
+  - Distribution of topics  
+  - Ticket inflow  
+  - Sentiment heatmap  
+  
+
+---
+
+##  Deliverables
+- **Live App:** [https://drishya-assignment-14sept-fktnrf58tr7wqbq2gnm4zx.streamlit.app/]
+- **Code Repo:** [https://github.com/DrishyaShah/Drishya-assignment-14Sept]  
+- **README:** [https://github.com/DrishyaShah/Drishya-assignment-14Sept/blob/main/README.md]
+
+---
+
+##  Known Limitations & Next Steps
+- To be Updated
+
+---
+
+
+## Local Setup Instructions
+
+### Prerequisites
 
 - Python 3.12 recommended
 - [pip](https://pip.pypa.io/en/stable/)
 - (Optional) [virtualenv](https://virtualenv.pypa.io/en/latest/) for isolated environments
 
-## 1. Clone the Repository
+### 1. Clone the Repository
 
 ```sh
 git clone https://github.com/DrishyaShah/Drishya-assignment-14Sept.git
 cd Drishya_assignment_Sept2025
 ```
 
-## 2. Create and Activate Virtual Environment (Recommended)
+### 2. Create and Activate Virtual Environment (Recommended)
 
 ```sh
 python -m venv venv
@@ -23,29 +155,29 @@ venv\Scripts\activate
 source venv/bin/activate
 ```
 
-## 3. Install Dependencies
+### 3. Install Dependencies
 
 ```sh
 pip install -r requirements.txt
 ```
 
-## 4. Environment Variables
+### 4. Environment Variables
 
 
 - Create a `.env` file and add necessary keys (API keys, DB paths, etc).
 
-## 5. Database Setup
+### 5. Database Setup
 
 - The project uses a local SQLite database at `chroma_atlan/chroma.sqlite3`.
 - The project also uses a Supabase PostgreSQL databsase for storing tickets. The schema is given in db.py file. 
 
-## 6. Run Main Application
+### 6. Run Main Application
 
 ```sh
 streamlit run main.py
 ```
 
-## 7. Streamlit Apps
+### 7. Streamlit Apps
 
 To run the agent or dashboard UI:
 
@@ -55,7 +187,7 @@ streamlit run apps/streamlit_agent.py
 streamlit run apps/streamlit_dashboard.py
 ```
 
-## 8. Development Workflow
+### 8. Development Workflow
 
 - Source code is in [`src/`](src/)
 - For workflow logic, see [`src/workflow.py`](src/workflow.py)
@@ -64,10 +196,14 @@ streamlit run apps/streamlit_dashboard.py
 
 
 
-## 9. Troubleshooting
+### 9. Troubleshooting
 
 - Ensure all environment variables are set.
 - Check `requirements.txt` for missing packages.
 - For DB issues, verify `chroma_atlan/chroma.sqlite3` exists and is accessible.
+
+
+##  Author
+Assignment submission by **Drishya Shah**
 
 ---
