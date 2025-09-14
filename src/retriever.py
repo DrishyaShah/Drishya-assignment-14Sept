@@ -14,7 +14,11 @@ embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-
 persist_dir = "./chroma_atlan"
 if not os.path.exists(persist_dir) or not os.listdir(persist_dir):
     df = pd.read_csv(os.path.join(os.path.dirname(__file__), "atlan_docs_cleaned.csv"))
+    #Fill NaN with empty string
+    df["content"] = df["content"].fillna("")
 
+    #drop rows with empty content
+    df = df[df["content"].str.strip() != ""]
 
 
     loader = DataFrameLoader(df, page_content_column="content")
