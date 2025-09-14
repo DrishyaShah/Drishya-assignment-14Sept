@@ -47,6 +47,14 @@ persist_dir = "./chroma_atlan"
 #     vectordb.persist()
 #     print(f"Loaded {len(chunks)} chunks into Chroma")
 
+# else:
+#     # Load existing vectorstore
+#     vectordb = Chroma(
+#         persist_directory=persist_dir,
+#         embedding_function=embeddings
+#     )
+
+
 # -----FOR CLOUD--------
 if not os.path.exists(persist_dir) or not os.listdir(persist_dir):
     df = pd.read_csv(os.path.join(os.path.dirname(__file__), "atlan_docs_cleaned.csv"))
@@ -71,21 +79,20 @@ if not os.path.exists(persist_dir) or not os.listdir(persist_dir):
     vectordb = Chroma.from_documents(
         documents=chunks,
         embedding=embeddings,
-        persist_directory=persist_dir,
-        client_settings={"chroma_db_impl": "duckdb+parquet"}
+        persist_directory=persist_dir
     )
     vectordb.persist()
     print(f"Loaded {len(chunks)} chunks into Chroma")
 
-#FOR LOCAL 
-# vectordb = Chroma(persist_directory=persist_dir, embedding_function=embeddings) 
+else:
+    # Load existing vectorstore
+    vectordb = Chroma(
+        persist_directory=persist_dir,
+        embedding_function=embeddings
+    )
 
-#FOR CLOUD
-vectordb = Chroma(
-    persist_directory=persist_dir,
-    embedding_function=embeddings,
-    client_settings={"chroma_db_impl": "duckdb+parquet"}  # key change
-)
+
+
 
 
 
