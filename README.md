@@ -27,8 +27,8 @@ Support teams face:
 
 ##  High-Level Architecture
 
-![System Architecture](assets/atlan-customer-support-architecture.png)
-![Workflow Diagram](assets/atlan-customer-support-workflow.png)
+![System Architecture](https://github.com/DrishyaShah/Drishya-assignment-14Sept/blob/main/atlan_customer_support_architecture.png)
+![Workflow Diagram](https://github.com/DrishyaShah/Drishya-assignment-14Sept/blob/main/atlan_customer_support_workflow.png)
 
 ### 1. Ingestion & Knowledge Base
 - Crawl docs via sitemap → clean HTML → normalize formatting  
