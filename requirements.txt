@@ -19,3 +19,4 @@ requests
 psycopg2-binary
 langchain-huggingface
 pysqlite3-binary 
+langchain-chroma>=0.1.2
