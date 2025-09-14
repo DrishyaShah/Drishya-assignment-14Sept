@@ -1,7 +1,7 @@
 """Retriever: embeddings + Chroma vectorstore setup."""
 from langchain_huggingface import HuggingFaceEmbeddings
-from langchain_chroma import Chroma
-from src.config import CHROMA_PERSIST_DIR
+from langchain.vectorstores import Chroma
+# from src.config import CHROMA_PERSIST_DIR
 import logging
 import pandas as pd
 import os 
