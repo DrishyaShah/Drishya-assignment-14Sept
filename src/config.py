@@ -17,12 +17,12 @@ load_dotenv()
 
 
 #### FOR CLOUD
-DB_USER = st.secrets("user")
-DB_PASSWORD = st.secrets("password")
-DB_HOST = st.secrets("host")
-DB_PORT = st.secrets("port")
-DB_NAME = st.secrets("dbname")
-GOOGLE_API_KEY = st.secrets("GOOGLE_API_KEY")
+DB_USER = st.secrets["user"]
+DB_PASSWORD = st.secrets["password"]
+DB_HOST = st.secrets["host"]
+DB_PORT = st.secrets["port"]
+DB_NAME = st.secrets["dbname"]
+GOOGLE_API_KEY = st.secrets["GOOGLE_API_KEY"]
 
 
 DATABASE_URL = (
