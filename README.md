@@ -125,7 +125,35 @@ Drishya_assignment_Sept2025/
 ---
 
 ##  Known Limitations & Next Steps
-- To be Updated
+### Current Limitations
+- **Latency**: The current RAG + classification pipeline can introduce noticeable response delays, especially under high load or when multiple retrievals are required.
+- **Rate Limits**: The deployed solution depends on the Gemini API, which enforces strict quota and rate limits. This can lead to request failures or throttling during peak usage.
+- **Single Model Dependency**: All classification and generation tasks rely on Gemini. Outages, quota exhaustion, or degraded performance directly affect system reliability.
+- **Scalability Constraints**: The system currently runs on a single Streamlit instance, which may not scale well under concurrent traffic.
+- **Evaluation Coverage**: While manual review of sample tickets to assess classification of topic, sentiment and priority along with citation checks is done, continuous automated evaluation for drift and hallucinations is limited.
+- **Security/Access Controls**: Role-based access and SSO for internal agents are not yet implemented.
+- **Caching**: Current caching strategy is minimal; repeat queries may still incur full retrieval and generation cost.
+
+### Next Steps
+- **Latency Optimizations**: 
+  - Introduce semantic caching for common queries.  
+  - Explore hybrid retrieval (BM25 + embeddings) to reduce over-fetching.  
+  - Parallelize retrieval and classification workflows where possible.
+- **Mitigating Rate Limits**: 
+  - Add exponential backoff, retries, and request batching.  
+  - Evaluate introducing a lightweight fallback model (e.g., local LLM) for classification-only tasks.
+- **Multi-Model Strategy**: 
+  - Split workloads (e.g., classification via smaller/cheaper models, generation via Gemini).  
+  - Considering multiple task specific models to avoid single-point dependency.
+- **Scalability**: 
+  - Containerize the backend for deployment on cloud platform.  
+  - Add autoscaling for high-traffic scenarios.
+- **Enhanced Evaluation**: 
+  - Build an automated evaluation harness with golden-set queries.  
+  - Track hallucination rate, latency breakdowns, and escalation accuracy over time.
+- **Security & Access**: 
+  - Integrate SSO and role-based access control for support agents.  
+  - Expand PII handling (masking, redaction in retrieval logs).
 
 ---
 
@@ -165,6 +193,19 @@ pip install -r requirements.txt
 
 
 - Create a `.env` file and add necessary keys (API keys, DB paths, etc).
+#### Sample `.env` file:
+
+```bash
+# Google Gemini API
+GOOGLE_API_KEY=your_gemini_api_key_here
+
+# Database (PostgreSQL via Supabase)
+user=your_db_username
+password=your_db_password
+host=your_db_host
+port=6543
+dbname=your_db_name
+```
 
 ### 5. Database Setup
 
