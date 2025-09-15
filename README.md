@@ -127,6 +127,7 @@ Drishya_assignment_Sept2025/
 - **Live App:** [https://drishya-assignment-14sept-fktnrf58tr7wqbq2gnm4zx.streamlit.app/]
 - **Code Repo:** [https://github.com/DrishyaShah/Drishya-assignment-14Sept]  
 - **README:** [https://github.com/DrishyaShah/Drishya-assignment-14Sept/blob/main/README.md]
+- **Demo Video:** [https://drive.google.com/file/d/189GTBRsnfc9yxktIjNL_C67-fi4vOfdS/view?usp=sharing]
 
 ---
 
