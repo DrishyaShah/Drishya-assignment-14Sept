@@ -2,10 +2,16 @@
 
 ## Overview
 This project implements a **Customer Support Copilot** to streamline support operations using:
+- An **interactive agent** for answering queries with citations.  
 - Automated ticket **classification (Topic, Sentiment, Priority)**
 - **Retrieval-Augmented Generation (RAG)** grounded in Atlan Docs & Developer Hub
 - **Smart escalation** when documentation is insufficient
 - **Dashboards** for monitoring classification, routing, and triage performance
+
+  **Note**: For simplicity, both the **dashboard** and the **interactive agent** are packaged in the same Streamlit application. In a real-world deployment:  
+- These would likely be **separate services** (agent for end-users, dashboard for internal staff).  
+- The **dashboard** would be restricted to **admins or support leads** via authentication and role-based access.  
+
 
 The solution was built with **Streamlit** for the UI, **Google Gemini 2.5 Flash** for language processing, and **Chroma Vector DB** for semantic retrieval. Ticket persistence is managed using **Supabase (Postgres)**.
 
@@ -133,6 +139,9 @@ Drishya_assignment_Sept2025/
 - **Evaluation Coverage**: While manual review of sample tickets to assess classification of topic, sentiment and priority along with citation checks is done, continuous automated evaluation for drift and hallucinations is limited.
 - **Security/Access Controls**: Role-based access and SSO for internal agents are not yet implemented.
 - **Caching**: Current caching strategy is minimal; repeat queries may still incur full retrieval and generation cost.
+- **VectorDB Persistence**: On the first run of the deployed app, embeddings are generated and stored locally in a Chroma `persist_directory`. On subsequent runs, the persisted store is reused. However, this approach ties persistence to the container filesystem, which may not be reliable across deployments. A better approach would be:  
+  - Store persisted embeddings in external cloud storage (e.g., AWS S3, GCP Cloud Storage).  
+  - Or switch to a managed cloud vector database (e.g., Pinecone, Weaviate, Qdrant Cloud) for durability and scalability.  
 
 ### Next Steps
 - **Latency Optimizations**: 
@@ -143,7 +152,7 @@ Drishya_assignment_Sept2025/
   - Add exponential backoff, retries, and request batching.  
   - Evaluate introducing a lightweight fallback model (e.g., local LLM) for classification-only tasks.
 - **Multi-Model Strategy**: 
-  - Split workloads (e.g., classification via smaller/cheaper models, generation via Gemini).  
+  - Split workloads (e.g., classification via lightweight models, generation via Gemini).  
   - Considering multiple task specific models to avoid single-point dependency.
 - **Scalability**: 
   - Containerize the backend for deployment on cloud platform.  
@@ -151,6 +160,7 @@ Drishya_assignment_Sept2025/
 - **Enhanced Evaluation**: 
   - Build an automated evaluation harness with golden-set queries.  
   - Track hallucination rate, latency breakdowns, and escalation accuracy over time.
+  - Add feedback-driven improvements (prompt tuning, error logging, user feedback loop).  
 - **Security & Access**: 
   - Integrate SSO and role-based access control for support agents.  
   - Expand PII handling (masking, redaction in retrieval logs).
